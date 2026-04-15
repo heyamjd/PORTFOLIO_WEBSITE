@@ -16,6 +16,7 @@ PORTFOLIO_WEBSITE-main/
 	portfolio.css             # Original static version (kept as reference)
 	portfolio.js              # Original static version (kept as reference)
 	package.json              # Root scripts to run both apps
+	render.yaml               # Render deployment blueprint
 ```
 
 ## Prerequisites
@@ -73,6 +74,34 @@ This starts:
 npm run build
 ```
 
-Build output is generated in `client/dist`.
+Build output is generated in `client/dist`. In production the Express server serves these files directly.
 
+## Deploy to Render
+
+This project includes a `render.yaml` Blueprint for one-click deployment on [Render](https://render.com).
+
+### Steps
+
+1. **Create a MongoDB Atlas cluster** (free tier available at [mongodb.com/atlas](https://www.mongodb.com/cloud/atlas)):
+   - Create a cluster and a database user.
+   - Allow network access from anywhere (`0.0.0.0/0`) or from Render's IP range.
+   - Copy the connection string (e.g. `mongodb+srv://user:password@cluster.mongodb.net/portfolio_db`).
+
+2. **Connect the repo to Render**:
+   - Go to [dashboard.render.com](https://dashboard.render.com) and click **New → Blueprint**.
+   - Select this GitHub repository.
+   - Render will detect `render.yaml` and create the `portfolio-website` web service automatically.
+
+3. **Set the `MONGO_URI` environment variable** in the Render dashboard:
+   - Navigate to the created service → **Environment**.
+   - Add `MONGO_URI` with your MongoDB Atlas connection string.
+
+4. **Deploy** – Render will build and start the service. The site will be available at `https://portfolio-website.onrender.com` (or your custom domain).
+
+### What happens during deployment
+
+| Step | Command |
+|------|---------|
+| Build | `npm run build` – installs all deps and builds the React app into `client/dist` |
+| Start | `npm run start` – starts the Express server with `NODE_ENV=production`, which also serves the built React app |
 
